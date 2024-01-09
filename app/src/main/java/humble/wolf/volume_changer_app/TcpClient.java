@@ -39,16 +39,20 @@ public class TcpClient {
                         if (listener != null) {
                             listener.onMessageReceived(response);
                         }
+
+                        System.out.println("RES: " + response);
                     }
 
                 } catch (UnknownHostException e) {
                     e.printStackTrace();
                     if (listener != null) {
+                        System.out.println("THIS?");
                         listener.onError(e);
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
                     if (listener != null) {
+                        System.out.println("Can't connect to server");
                         listener.onError(e);
                     }
                 } finally {

@@ -2,6 +2,7 @@ package humble.wolf.volume_changer_app;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -49,6 +50,11 @@ public class StartActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        if(message.equals("The Session ID is incorrect")){
+                            Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
                         Intent intent = new Intent(StartActivity.this, MainActivity.class);
 
                         intent.putExtra("ip", ip);
@@ -63,7 +69,8 @@ public class StartActivity extends AppCompatActivity {
 
             @Override
             public void onError(Exception e) {
-                Toast.makeText(getApplicationContext(), "Server not found", Toast.LENGTH_SHORT).show();
+                Looper.prepare();
+                Toast.makeText(getApplicationContext(), "Can't connect to server", Toast.LENGTH_SHORT).show();
             }
         };
         // Replace these values with your actual IP address, port, and message

@@ -3,6 +3,7 @@ package humble.wolf.volume_changer_app;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -25,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
     private String sessionID = "";
     private String ipAddress = "";
     private int port = 0;
+    private int multiplier = 5; //TODO que se pueda cambiar el multiplicador desde la interfaz, tal vez unos botones en el lateral para seleccionar a lo x1 x3 x5 nose
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,7 +51,10 @@ public class MainActivity extends AppCompatActivity {
         upVolume.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int vol = volume + 1;
+                int vol = volume + 1 * multiplier;
+                if(vol > 100) {
+                    vol = 100;
+                }
                 updateVolume(vol);
             }
         });
@@ -57,7 +62,10 @@ public class MainActivity extends AppCompatActivity {
         downVolume.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int vol = volume - 1;
+                int vol = volume - 1 * multiplier;
+                if(vol < 0) {
+                    vol = 0;
+                }
                 updateVolume(vol);
             }
         });
@@ -77,6 +85,12 @@ public class MainActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+
+                        if(message.equals("The Session ID is incorrect")){
+                            Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
                         volume = Integer.parseInt(message);
                         volumeText.setText(message);
                     }
@@ -87,7 +101,9 @@ public class MainActivity extends AppCompatActivity {
             public void onError(Exception e) {
                 // Handle errors
                 Log.e("TcpClient", "Error: " + e.getMessage());
-
+                Looper.prepare();
+                Toast.makeText(getApplicationContext(), "Can't connect to server", Toast.LENGTH_SHORT).show();
+                changeScene();
                 // You can update UI elements or perform other actions based on the error
             }
         };
@@ -120,7 +136,9 @@ public class MainActivity extends AppCompatActivity {
             public void onError(Exception e) {
                 // Handle errors
                 Log.e("TcpClient", "Error: " + e.getMessage());
-
+                Looper.prepare();
+                Toast.makeText(getApplicationContext(), "Can't connect to server", Toast.LENGTH_SHORT).show();
+                changeScene();
                 // You can update UI elements or perform other actions based on the error
             }
         };
@@ -153,7 +171,9 @@ public class MainActivity extends AppCompatActivity {
             public void onError(Exception e) {
                 // Handle errors
                 Log.e("TcpClient", "Error: " + e.getMessage());
-
+                Looper.prepare();
+                Toast.makeText(getApplicationContext(), "Can't connect to server", Toast.LENGTH_SHORT).show();
+                changeScene();
                 // You can update UI elements or perform other actions based on the error
             }
         };
@@ -161,5 +181,15 @@ public class MainActivity extends AppCompatActivity {
 
         // Send the message using the TcpClient
         TcpClient.sendMessage(ipAddress, port, messageToSend, listener);
+    }
+
+    void changeScene() {
+        Intent intent = new Intent(MainActivity.this, StartActivity.class);
+
+        intent.putExtra("ip", ipAddress);
+        intent.putExtra("port", port);
+
+        // Start the new activity
+        startActivity(intent);
     }
 }
